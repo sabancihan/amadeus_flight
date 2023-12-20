@@ -7,6 +7,7 @@ import com.sabancihan.amadeus_flight.model.Airport;
 import com.sabancihan.amadeus_flight.repository.AirportRepository;
 import com.sabancihan.amadeus_flight.service.AirportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,11 +21,13 @@ public class AirportServiceImpl implements AirportService {
     private final AirportRepository airportRepository;
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void removeAirport(UUID id) {
         airportRepository.deleteById(id);
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     public AirportCreateResponse createAirport(AirportCreateRequest airportCreateRequest) {
 
           Airport airport =  airportRepository.save(Airport.builder()

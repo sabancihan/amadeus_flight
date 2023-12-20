@@ -19,6 +19,10 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
 
+    public enum Role {
+        ADMIN, USER
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -30,6 +34,12 @@ public class User {
 
     @NotNull
     private String password;
+
+    @NotNull
+    @Enumerated(EnumType.ORDINAL)
+    private Role role;
+
+
 
     @Override
     public final boolean equals(Object o) {

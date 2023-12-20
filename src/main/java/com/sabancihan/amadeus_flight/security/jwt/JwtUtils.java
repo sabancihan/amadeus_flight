@@ -7,10 +7,12 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -30,17 +32,18 @@ public class JwtUtils {
         return Jwts.builder()
                 .subject(authentication.getName())
                 .issuedAt(now)
+                .claim("roles", authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
                 .expiration(new Date(now.getTime() + secretConfig.getTokenExpirationTime()))
                 .signWith(key())
                 .compact();
     }
 
 
-public String getUsernameFromToken(String authToken) {
+public Claims getClaimsFromToken(String authToken) {
     return Jwts.parser()
             .verifyWith(key())
             .build()
-            .parseSignedClaims(authToken).getPayload().getSubject();
+            .parseSignedClaims(authToken).getPayload();
 }
 
 

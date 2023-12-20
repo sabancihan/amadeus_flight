@@ -1,6 +1,7 @@
 package com.sabancihan.amadeus_flight.security.init;
 
 import com.sabancihan.amadeus_flight.dto.request.RegisterRequest;
+import com.sabancihan.amadeus_flight.model.User;
 import com.sabancihan.amadeus_flight.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -17,6 +18,8 @@ public class TempUserCreator implements CommandLineRunner {
                RegisterRequest.builder()
                         .username("admin")
                         .password("trial")
+                        .role(User.Role.ADMIN)
+
                         .build()
         );
 
@@ -24,6 +27,7 @@ public class TempUserCreator implements CommandLineRunner {
                 RegisterRequest.builder()
                         .username("user")
                         .password("trial1")
+                        .role(User.Role.USER)
                         .build()
         );
 

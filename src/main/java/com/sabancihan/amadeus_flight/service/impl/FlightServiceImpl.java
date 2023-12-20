@@ -11,6 +11,7 @@ import com.sabancihan.amadeus_flight.repository.FlightRepository;
 import com.sabancihan.amadeus_flight.service.FlightService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,11 +27,13 @@ public class FlightServiceImpl implements FlightService {
     private final ObjectMapper objectMapper;
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void removeFlight(UUID id) {
         flightRepository.deleteById(id);
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     public FlightCreateResponse createFlight(FlightCreateRequest flightCreateRequest) throws BadRequestException {
         if (flightCreateRequest.getArrivalAirportId().equals(flightCreateRequest.getDepartureAirportId())) {
             throw new BadRequestException("Arrival and departure airports cannot be the same");
@@ -58,6 +61,7 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
     public FlightGetResponse updateFlight(UUID id, FlightUpdateRequest flightUpdateRequest) throws JsonMappingException {
 
         Flight flight = flightRepository.findById(id).orElseThrow();
