@@ -2,6 +2,8 @@ package com.sabancihan.amadeus_flight.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -16,7 +18,6 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 
 public class Flight {
     @Id
@@ -24,15 +25,22 @@ public class Flight {
     private UUID id;
 
 
+    @NotNull
     LocalDateTime departureTime; //utc time
+
+    @NotNull
     LocalDateTime arrivalTime; //utc time
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "departure_airport_id", nullable = false)
     Airport departureAirport;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "arrival_airport_id", nullable = false)
     Airport arrivalAirport;
 
+    @NotNull
+    @Min(0)
     BigDecimal price;
 
     @Override
