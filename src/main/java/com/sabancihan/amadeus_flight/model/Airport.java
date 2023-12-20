@@ -1,13 +1,11 @@
 package com.sabancihan.amadeus_flight.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,7 +24,14 @@ public class Airport {
 
 
     @NotNull
+    @Column(nullable = false,updatable = false)
     private String city;
+
+    @OneToMany(mappedBy = "departureAirport", fetch = FetchType.LAZY, cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Flight> departureFlights;
+
+    @OneToMany(mappedBy = "arrivalAirport", fetch = FetchType.LAZY, cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Flight> arrivalFlights;
 
     //airport name was not asked in the assignment
 

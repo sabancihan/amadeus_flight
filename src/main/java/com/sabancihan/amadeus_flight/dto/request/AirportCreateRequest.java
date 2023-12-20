@@ -2,17 +2,17 @@ package com.sabancihan.amadeus_flight.dto.request;
 
 
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class RegisterRequest {
-    @NotNull
-    private String username;
 
+public class AirportCreateRequest {
     @NotNull
-    private String password;
+    private String city;
 }

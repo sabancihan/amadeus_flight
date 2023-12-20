@@ -25,23 +25,31 @@ public class Flight {
     private UUID id;
 
 
-    @NotNull
     LocalDateTime departureTime; //utc time
 
-    @NotNull
+
     LocalDateTime arrivalTime; //utc time
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "departure_airport_id", nullable = false)
+    @JoinColumn(name = "departure_airport_id", nullable = false,insertable = false,updatable = false)
     Airport departureAirport;
 
+    @Column(name = "departure_airport_id")
+    private UUID departureAirportId;
+
+
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "arrival_airport_id", nullable = false)
+    @JoinColumn(name = "arrival_airport_id", nullable = false,insertable = false,updatable = false)
     Airport arrivalAirport;
 
-    @NotNull
-    @Min(0)
+    @Column(name = "arrival_airport_id")
+    private UUID arrivalAirportId;
+
+
     BigDecimal price;
+
+
 
     @Override
     public final boolean equals(Object o) {
