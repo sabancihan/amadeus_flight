@@ -2,10 +2,12 @@ package com.sabancihan.amadeus_flight.controller;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sabancihan.amadeus_flight.dto.request.FlightCreateRequest;
+import com.sabancihan.amadeus_flight.dto.request.FlightSearchRequest;
 import com.sabancihan.amadeus_flight.dto.request.FlightUpdateRequest;
 import com.sabancihan.amadeus_flight.dto.response.AirportGetResponse;
 import com.sabancihan.amadeus_flight.dto.response.FlightCreateResponse;
 import com.sabancihan.amadeus_flight.dto.response.FlightGetResponse;
+import com.sabancihan.amadeus_flight.dto.response.FlightSearchResponse;
 import com.sabancihan.amadeus_flight.service.FlightService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +50,11 @@ public class FlightController {
     @GetMapping
     public List<FlightGetResponse> getAllFlights() {
         return flightService.getAllFlights();
+    }
+
+
+    @PostMapping("/search")
+    public FlightSearchResponse searchFlights(@Valid @RequestBody FlightSearchRequest flightSearchRequest) throws BadRequestException {
+        return flightService.searchFlights(flightSearchRequest);
     }
 }

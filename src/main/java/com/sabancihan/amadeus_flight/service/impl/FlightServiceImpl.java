@@ -3,9 +3,11 @@ package com.sabancihan.amadeus_flight.service.impl;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabancihan.amadeus_flight.dto.request.FlightCreateRequest;
+import com.sabancihan.amadeus_flight.dto.request.FlightSearchRequest;
 import com.sabancihan.amadeus_flight.dto.request.FlightUpdateRequest;
 import com.sabancihan.amadeus_flight.dto.response.FlightCreateResponse;
 import com.sabancihan.amadeus_flight.dto.response.FlightGetResponse;
+import com.sabancihan.amadeus_flight.dto.response.FlightSearchResponse;
 import com.sabancihan.amadeus_flight.model.Flight;
 import com.sabancihan.amadeus_flight.repository.FlightRepository;
 import com.sabancihan.amadeus_flight.service.FlightService;
@@ -77,5 +79,15 @@ public class FlightServiceImpl implements FlightService {
     @Override
     public List<FlightGetResponse> getAllFlights() {
         return flightRepository.findAll().stream().map(FlightGetResponse::fromFlight).toList();
+    }
+
+    @Override
+    public FlightSearchResponse searchFlights(FlightSearchRequest flightSearchRequest) throws BadRequestException {
+        if (flightSearchRequest.getReturnDate() == null) {
+            return FlightSearchResponse.builder()
+                    .departures(flightRepository.findOneWayAllByDepartureAirportAndArrivalAirportAndDepartureTime(flightSearchRequest.getDepartureAirport(), flightSearchRequest.getArrivalAirport(), flightSearchRequest.getDepartureDate(), flightSearchRequest.getDepartureDate().plusDays(1)))
+                    .build();
+        }
+        return null;
     }
 }
