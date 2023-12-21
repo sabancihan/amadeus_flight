@@ -1,6 +1,7 @@
 package com.sabancihan.amadeus_flight.dto.request;
 
 import com.sabancihan.amadeus_flight.model.Airport;
+import com.sabancihan.amadeus_flight.model.Flight;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -45,6 +46,18 @@ public class FlightCreateRequest {
     public boolean isValid() {
         return arrivalTime.isAfter(departureTime) && !arrivalAirportId.equals(departureAirportId);
     }
+
+    public Flight toFlight() {
+        return Flight.builder()
+                .arrivalAirportId(this.getArrivalAirportId())
+                .departureAirportId(this.getDepartureAirportId())
+                .price(this.getPrice())
+                .departureTime(this.getDepartureTime())
+                .arrivalTime(this.getArrivalTime())
+                .build();
+    }
+
+
 
 
 

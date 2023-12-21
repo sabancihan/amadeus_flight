@@ -5,24 +5,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sabancihan.amadeus_flight.dto.request.FlightCreateRequest;
 import com.sabancihan.amadeus_flight.dto.request.FlightSearchRequest;
 import com.sabancihan.amadeus_flight.dto.request.FlightUpdateRequest;
-import com.sabancihan.amadeus_flight.dto.response.FlightCreateResponse;
-import com.sabancihan.amadeus_flight.dto.response.FlightGetResponse;
-import com.sabancihan.amadeus_flight.dto.response.FlightSearchResponse;
-import com.sabancihan.amadeus_flight.dto.response.FlightSearchResult;
+import com.sabancihan.amadeus_flight.dto.response.*;
 import com.sabancihan.amadeus_flight.exception.FlightNotFoundException;
 import com.sabancihan.amadeus_flight.model.Flight;
 import com.sabancihan.amadeus_flight.repository.FlightRepository;
+import com.sabancihan.amadeus_flight.service.AirportService;
 import com.sabancihan.amadeus_flight.service.FlightService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.context.request.WebRequest;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -34,6 +39,12 @@ public class FlightServiceImpl implements FlightService {
     private final FlightRepository flightRepository;
 
     private final ObjectMapper objectMapper;
+
+    private final AirportService airportService;
+
+    @Value("${amadeus.mock.api}")
+    private String mockapi;
+
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -48,17 +59,38 @@ public class FlightServiceImpl implements FlightService {
             throw new BadRequestException("Arrival and departure airports cannot be the same");
         }
 
-        Flight flight = flightRepository.save(Flight.builder()
-                .arrivalAirportId(flightCreateRequest.getArrivalAirportId())
-                .departureAirportId(flightCreateRequest.getDepartureAirportId())
-                .price(flightCreateRequest.getPrice())
-                .departureTime(flightCreateRequest.getDepartureTime())
-                .arrivalTime(flightCreateRequest.getArrivalTime())
-                .build());
+        Flight flight = flightRepository.save(flightCreateRequest.toFlight());
 
         return FlightCreateResponse.fromFlight(flight);
 
 
+    }
+
+    @Scheduled(cron = "0 0 0 * * *", zone = "UTC")
+    @EventListener(ApplicationReadyEvent.class)
+    public void addNewFlights() {
+        RestClient restClient = RestClient.create();
+        FlightCreateRequest[] mockFlightResponse = restClient.get()
+                .uri(mockapi)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body(FlightCreateRequest[].class);
+
+        if (mockFlightResponse == null) {
+            return;
+        }
+
+        List<Flight> flights = Stream.of(mockFlightResponse).map(FlightCreateRequest::toFlight).toList();
+
+        //because of the mock api airports id's may not be valid and cannot be synced also arrival and departure times may not be valid
+        Set<UUID> airportIds = airportService.getAirportIds();
+
+        if (airportIds.size() < 2) {
+            return; //if there are less than 2 airports in the database there is no point in adding flights as departure and arrival airports cannot be the same
+        }
+
+
+        flightRepository.saveAll(flights.stream().filter(flight -> airportIds.contains(flight.getArrivalAirportId()) && airportIds.contains(flight.getDepartureAirportId()) && flight.getArrivalTime().isAfter(flight.getDepartureTime())).toList());
     }
 
     @Override
@@ -68,6 +100,8 @@ public class FlightServiceImpl implements FlightService {
 
 
     }
+
+
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")

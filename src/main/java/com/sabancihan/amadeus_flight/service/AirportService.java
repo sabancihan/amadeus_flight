@@ -5,6 +5,7 @@ import com.sabancihan.amadeus_flight.dto.response.AirportCreateResponse;
 import com.sabancihan.amadeus_flight.dto.response.AirportGetResponse;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface AirportService {
@@ -16,6 +17,8 @@ public interface AirportService {
 
     List<AirportGetResponse> getAllAirports();
 
+
+    Set<UUID> getAirportIds();
 
 
 

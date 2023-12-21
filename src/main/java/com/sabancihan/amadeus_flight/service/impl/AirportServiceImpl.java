@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -50,5 +51,11 @@ public class AirportServiceImpl implements AirportService {
     @Override
     public List<AirportGetResponse> getAllAirports() {
         return airportRepository.findAll().stream().map(AirportGetResponse::fromAirport).toList();
+    }
+
+    @Override
+    public Set<UUID> getAirportIds() {
+        return airportRepository.getAirportIds();
+
     }
 }
