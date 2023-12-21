@@ -8,16 +8,22 @@ import com.sabancihan.amadeus_flight.dto.request.FlightUpdateRequest;
 import com.sabancihan.amadeus_flight.dto.response.FlightCreateResponse;
 import com.sabancihan.amadeus_flight.dto.response.FlightGetResponse;
 import com.sabancihan.amadeus_flight.dto.response.FlightSearchResponse;
+import com.sabancihan.amadeus_flight.dto.response.FlightSearchResult;
+import com.sabancihan.amadeus_flight.exception.FlightNotFoundException;
 import com.sabancihan.amadeus_flight.model.Flight;
 import com.sabancihan.amadeus_flight.repository.FlightRepository;
 import com.sabancihan.amadeus_flight.service.FlightService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import static java.util.stream.Collectors.groupingBy;
 
 //left here
 @Service
@@ -82,12 +88,48 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
-    public FlightSearchResponse searchFlights(FlightSearchRequest flightSearchRequest) throws BadRequestException {
+    public FlightSearchResponse searchFlights(FlightSearchRequest flightSearchRequest) throws BadRequestException, FlightNotFoundException {
+        String departureAirport = flightSearchRequest.getDepartureAirport();
+        String arrivalAirport = flightSearchRequest.getArrivalAirport();
+
+
+
+
         if (flightSearchRequest.getReturnDate() == null) {
+
+            List<FlightSearchResult> flights = flightRepository.findOneWayAllByDepartureAirportAndArrivalAirportAndDepartureTime(departureAirport, arrivalAirport, flightSearchRequest.getDepartureDate(), flightSearchRequest.getDepartureDate().plusDays(1));
+
+            if (flights == null) {
+                throw new FlightNotFoundException("No flights found");
+            }
+
             return FlightSearchResponse.builder()
-                    .departures(flightRepository.findOneWayAllByDepartureAirportAndArrivalAirportAndDepartureTime(flightSearchRequest.getDepartureAirport(), flightSearchRequest.getArrivalAirport(), flightSearchRequest.getDepartureDate(), flightSearchRequest.getDepartureDate().plusDays(1)))
+                    .departures(flights)
                     .build();
         }
-        return null;
+        else {
+
+
+            Map<String,List<FlightSearchResult>> flightSearchResults =
+                   flightRepository.findTwoWayAllByDepartureAirportAndArrivalAirportAndDepartureTime(departureAirport,arrivalAirport, flightSearchRequest.getDepartureDate(), flightSearchRequest.getDepartureDate().plusDays(1), flightSearchRequest.getReturnDate(), flightSearchRequest.getReturnDate().plusDays(1)).stream().collect(groupingBy(FlightSearchResult::getDepartureCity));
+
+
+
+
+            List<FlightSearchResult> departureFlights = flightSearchResults.get(departureAirport);
+            List<FlightSearchResult> arrivalFlights = flightSearchResults.get(arrivalAirport);
+
+
+            if (departureFlights == null || arrivalFlights == null) {
+                throw new FlightNotFoundException("No flights found");
+            }
+
+
+            return FlightSearchResponse.builder()
+                    .departures(departureFlights)
+                    .returns(arrivalFlights)
+                    .build();
+
+        }
     }
 }

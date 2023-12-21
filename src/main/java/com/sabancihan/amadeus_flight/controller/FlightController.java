@@ -8,6 +8,7 @@ import com.sabancihan.amadeus_flight.dto.response.AirportGetResponse;
 import com.sabancihan.amadeus_flight.dto.response.FlightCreateResponse;
 import com.sabancihan.amadeus_flight.dto.response.FlightGetResponse;
 import com.sabancihan.amadeus_flight.dto.response.FlightSearchResponse;
+import com.sabancihan.amadeus_flight.exception.FlightNotFoundException;
 import com.sabancihan.amadeus_flight.service.FlightService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,7 @@ public class FlightController {
 
 
     @PostMapping("/search")
-    public FlightSearchResponse searchFlights(@Valid @RequestBody FlightSearchRequest flightSearchRequest) throws BadRequestException {
+    public FlightSearchResponse searchFlights(@Valid @RequestBody FlightSearchRequest flightSearchRequest) throws BadRequestException, FlightNotFoundException {
         return flightService.searchFlights(flightSearchRequest);
     }
 }

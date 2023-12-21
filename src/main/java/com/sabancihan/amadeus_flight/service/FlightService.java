@@ -7,6 +7,7 @@ import com.sabancihan.amadeus_flight.dto.request.FlightUpdateRequest;
 import com.sabancihan.amadeus_flight.dto.response.FlightCreateResponse;
 import com.sabancihan.amadeus_flight.dto.response.FlightGetResponse;
 import com.sabancihan.amadeus_flight.dto.response.FlightSearchResponse;
+import com.sabancihan.amadeus_flight.exception.FlightNotFoundException;
 import org.apache.coyote.BadRequestException;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public interface FlightService {
 
     List<FlightGetResponse> getAllFlights();
 
-    FlightSearchResponse searchFlights(FlightSearchRequest flightSearchRequest) throws BadRequestException;
+    FlightSearchResponse searchFlights(FlightSearchRequest flightSearchRequest) throws BadRequestException, FlightNotFoundException;
 
 
 

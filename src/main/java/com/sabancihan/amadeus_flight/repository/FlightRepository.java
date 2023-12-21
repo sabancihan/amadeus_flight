@@ -14,8 +14,14 @@ public interface FlightRepository extends JpaRepository<Flight, UUID> {
 
 
 
-    @Query(value = "SELECT f.id as id,price,d.id as departureId,a.id as arrivalId FROM Flight f INNER JOIN airport d ON f.departure_airport_id = d.id INNER JOIN airport a ON f.arrival_airport_id = a.id WHERE d.city = ?1 AND a.city = ?2 AND f.departure_time >= ?3 AND f.departure_time < ?4 ORDER BY price", nativeQuery = true)
+    @Query(value = "SELECT f.id as id,price,d.id as departureId,a.id as arrivalId,f.departure_time as departureTime,f.arrival_time as arrivalTime,d.city as departureCity,a.city as arrivalCity FROM Flight f INNER JOIN airport d ON f.departure_airport_id = d.id INNER JOIN airport a ON f.arrival_airport_id = a.id WHERE d.city = ?1 AND a.city = ?2 AND f.departure_time >= ?3 AND f.departure_time < ?4 ORDER BY price", nativeQuery = true)
     List<FlightSearchResult> findOneWayAllByDepartureAirportAndArrivalAirportAndDepartureTime(String departureAirport, String arrivalAirport, LocalDate departureTimeStart, LocalDate departureTimeEnd);
+
+
+    @Query(value = "SELECT f.id as id,price,d.id as departureId,a.id as arrivalId,f.departure_time as departureTime,f.arrival_time as arrivalTime,d.city as departureCity,a.city as arrivalCity  FROM Flight f INNER JOIN airport d ON f.departure_airport_id = d.id INNER JOIN airport a ON f.arrival_airport_id = a.id WHERE (d.city = ?1 AND a.city = ?2 AND f.departure_time >= ?3 AND f.departure_time < ?4) OR (d.city = ?2 AND a.city = ?1 AND f.departure_time >= ?5 AND f.departure_time < ?6) ORDER BY departure_time "
+            , nativeQuery = true)
+    List<FlightSearchResult> findTwoWayAllByDepartureAirportAndArrivalAirportAndDepartureTime(String departureAirport, String arrivalAirport, LocalDate departureTimeStart, LocalDate departureTimeEnd, LocalDate returnTimeStart, LocalDate returnTimeEnd);
+
 
 
 }
