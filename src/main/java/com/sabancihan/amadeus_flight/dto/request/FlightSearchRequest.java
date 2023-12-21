@@ -1,6 +1,7 @@
 package com.sabancihan.amadeus_flight.dto.request;
 
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,4 +26,6 @@ public class FlightSearchRequest {
     LocalDate departureDate;
 
     LocalDate returnDate;
+
+
 }

@@ -43,7 +43,7 @@ public class FlightCreateRequest {
     @AssertTrue
 
     public boolean isValid() {
-        return arrivalTime.isAfter(departureTime);
+        return arrivalTime.isAfter(departureTime) && !arrivalAirportId.equals(departureAirportId);
     }
 
 
