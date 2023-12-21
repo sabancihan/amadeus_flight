@@ -16,6 +16,7 @@ import com.sabancihan.amadeus_flight.service.FlightService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -86,6 +87,7 @@ public class FlightServiceImpl implements FlightService {
     public List<FlightGetResponse> getAllFlights() {
         return flightRepository.findAll().stream().map(FlightGetResponse::fromFlight).toList();
     }
+
 
     @Override
     public FlightSearchResponse searchFlights(FlightSearchRequest flightSearchRequest) throws BadRequestException, FlightNotFoundException {

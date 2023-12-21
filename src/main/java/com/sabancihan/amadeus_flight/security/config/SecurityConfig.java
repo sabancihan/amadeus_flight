@@ -59,7 +59,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))) //jwt
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/api/auth/**").permitAll()
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/api/auth/**","/v3/**","/swagger-ui/**").permitAll() //v3 and swagger-ui is for swagger if authenticating is needed for swagger change this
                         .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable) //jwt
 
